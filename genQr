@@ -1,0 +1,27 @@
+#!/bin/python
+
+#import fileinput
+import sys
+import qrcode
+from argparse import ArgumentParser
+
+parser = ArgumentParser()
+
+parser.add_argument("-f", "--file", dest="file", type=str, metavar="FILE", help="Save to file FILE", default=None)
+parser.add_argument("-S", "--show", dest="show", action='store_true')
+args = parser.parse_args()
+file=args.file
+show=args.show
+
+data = ''
+
+#for line in fileinput.input():
+for line in sys.stdin.readlines():
+    data = data + line
+
+img = qrcode.make(data)
+if show:
+    img.show()
+
+if file:
+    img.save(file)
