@@ -7,21 +7,28 @@ from argparse import ArgumentParser
 
 parser = ArgumentParser()
 
+parser.add_argument("-c", "--bg-color", dest="bg", type=str, metavar="BG_COLOR", help="Specify Qr background color", default="white")
+parser.add_argument("-C", "--fg-color", dest="fg", type=str, metavar="FG_COLOR", help="Specify Qr foreground color", default="black")
 parser.add_argument("-f", "--file", dest="file", type=str, metavar="FILE", help="Save to file FILE", default=None)
+parser.add_argument("-b", "--border-size", dest="border", type=int, metavar="BORDER_SIZE", help="Specify borders size", default=4)
+parser.add_argument("-B", "--box-size", dest="box", type=int, metavar="BOX_SIZE", help="Specify box size", default=10)
+parser.add_argument("-V", dest="ver", type=int, metavar="QR_VERSION", help="Use qrcode version QR_VERSION", default=1)
 parser.add_argument("-S", "--show", dest="show", action='store_true')
 args = parser.parse_args()
-file=args.file
-show=args.show
 
 data = ''
 
-#for line in fileinput.input():
 for line in sys.stdin.readlines():
     data = data + line
 
-img = qrcode.make(data)
-if show:
+qr = qrcode.QRCode(version = args.ver, box_size = args.box, border = args.border, error_correction = qrcode.constants.ERROR_CORRECT_H)
+qr.add_data(data)
+qr.make(fit=True)
+
+img = qr.make_image(fill_color=args.fg, back_color=args.bg)
+
+if args.show:
     img.show()
 
-if file:
-    img.save(file)
+if args.file:
+    img.save(args.file)
